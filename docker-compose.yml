@@ -115,6 +115,43 @@ services:
       kafka:                                    
         condition: service_healthy
 
+#SMS Service
+  sms-service:
+    build:
+      context: ./sms-service
+      dockerfile: Dockerfile
+    container_name: sms-service
+    ports:
+      - "3008:3008"
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SERVICE_NAME=sms-service
+    networks:
+      - microservices-net
+    depends_on:
+      #kafka-init:
+      #  condition: service_completed_successfully
+      kafka:
+# Email Service
+  email-service:
+    build:
+      context: ./email-service
+      dockerfile: Dockerfile
+    container_name: email-service
+    ports:
+      - "3007:3007"
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SERVICE_NAME=email-service
+      - EMAIL_USER=notificaciones.labeventdriven@gmail.com
+      - EMAIL_PASS=suni htqt utdk uuhj
+    depends_on:
+      # kafka-init:  
+      #   condition: service_completed_successfully
+      kafka:                                    
+        condition: service_healthy
+    networks:
+      - microservices-net
 # Order Service - Creates and tracks orders
   order-service:
     build:
@@ -122,13 +159,32 @@ services:
       dockerfile: Dockerfile
     container_name: order-service
     ports:
-      - "3004:3004"
+      - "3003:3003"
     environment:
       - KAFKA_BROKER=kafka:29092
       - SERVICE_NAME=order-service
     networks:
       - microservices-net
     depends_on:
+      kafka:                                    
+        condition: service_healthy
+
+# Payment service
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    ports:
+      - "3004:3004"
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SERVICE_NAME=payment-service
+    networks:
+      - microservices-net
+    depends_on:
+      # kafka-init:  
+      #   condition: service_completed_successfully
       kafka:                                    
         condition: service_healthy
 
@@ -144,6 +200,25 @@ services:
     environment:
       - KAFKA_BROKER=kafka:29092
       - SERVICE_NAME=shipping-service
+    networks:
+      - microservices-net
+    depends_on:
+      # kafka-init:  
+      #   condition: service_completed_successfully
+      kafka:                                    
+        condition: service_healthy
+
+#analytics service
+  analytics-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    container_name: analytics-service
+    ports:
+      - "3010:3010"
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SERVICE_NAME=analytics-service
     networks:
       - microservices-net
     depends_on:

@@ -1,56 +1,59 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: order-service-config
+  name: sms-service-config
   namespace: microservices
 data:
   KAFKA_BROKER: "kafka:29092"
-  SERVICE_NAME: "order-service"
+  SERVICE_NAME: "sms-service"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: order-service
+  name: sms-service
   namespace: microservices
   labels:
-    app: order-service
+    app: sms-service
 spec:
   type: ClusterIP
   ports:
-  - port: 3003
-    targetPort: 3003
+  - port: 3008
+    targetPort: 3008
     protocol: TCP
     name: http
   selector:
-    app: order-service
+    app: sms-service
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: sms-service
   namespace: microservices
   labels:
-    app: order-service
+    app: sms-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: sms-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: sms-service
     spec:
       containers:
-      - name: order-service
-        image: order-service:latest
+      - name: sms-service
+        image: sms-service:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 3003
+        - containerPort: 3008
           name: http
         envFrom:
         - configMapRef:
-            name: order-service-config
+            name: sms-service-config
+        env:
+        - name: PORT
+          value: "3008"
         resources:
           requests:
             memory: "128Mi"
@@ -61,12 +64,12 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3008
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3008
           initialDelaySeconds: 10
           periodSeconds: 5

@@ -37,13 +37,13 @@ This project implements an event-driven microservices architecture with the foll
    - Manages product catalog
    - Publishes: `product.created`, `product.updated`
 
-3. **Order Service** (Port 3004, Go) ⭐
+3. **Order Service** (Port 3003, Go) ⭐
    - Creates and tracks orders
    - Publishes: `order.created`, `order.completed`
    - Consumes: `payment.success`
    - **Flow**: Creates order → Waits for payment → Completes order → Triggers inventory/shipping
 
-4. **Inventory Service** (Port 3003, Node.js)
+4. **Inventory Service** (Port 3005, Node.js)
    - Tracks stock levels
    - Publishes: `inventory.updated`
    - Consumes: `order.created`, `order.completed`, `product.created`

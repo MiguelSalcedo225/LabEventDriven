@@ -1,72 +1,73 @@
+#analytics-service
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: order-service-config
+  name: analytics-service-config
   namespace: microservices
 data:
   KAFKA_BROKER: "kafka:29092"
-  SERVICE_NAME: "order-service"
+  SERVICE_NAME: "analytics-service"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: order-service
+  name: analytics-service
   namespace: microservices
   labels:
-    app: order-service
+    app: analytics-service
 spec:
   type: ClusterIP
   ports:
-  - port: 3003
-    targetPort: 3003
+  - port: 3010
+    targetPort: 3010
     protocol: TCP
     name: http
   selector:
-    app: order-service
+    app: analytics-service
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: analytics-service
   namespace: microservices
   labels:
-    app: order-service
+    app: analytics-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: analytics-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: analytics-service
     spec:
       containers:
-      - name: order-service
-        image: order-service:latest
+      - name: analytics-service
+        image: analytics-service:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 3003
+        - containerPort: 3010
           name: http
         envFrom:
         - configMapRef:
-            name: order-service-config
+            name: analytics-service-config
         resources:
           requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
             memory: "128Mi"
             cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "250m"
         livenessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3010
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3010
           initialDelaySeconds: 10
           periodSeconds: 5

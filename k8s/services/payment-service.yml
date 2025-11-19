@@ -1,56 +1,56 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: order-service-config
+  name: payment-service-config
   namespace: microservices
 data:
   KAFKA_BROKER: "kafka:29092"
-  SERVICE_NAME: "order-service"
+  SERVICE_NAME: "payment-service"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: order-service
+  name: payment-service
   namespace: microservices
   labels:
-    app: order-service
+    app: payment-service
 spec:
   type: ClusterIP
   ports:
-  - port: 3003
-    targetPort: 3003
+  - port: 3004
+    targetPort: 3004
     protocol: TCP
     name: http
   selector:
-    app: order-service
+    app: payment-service
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: payment-service
   namespace: microservices
   labels:
-    app: order-service
+    app: payment-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: payment-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: payment-service
     spec:
       containers:
-      - name: order-service
-        image: order-service:latest
+      - name: payment-service
+        image: payment-service:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 3003
+        - containerPort: 3004
           name: http
         envFrom:
         - configMapRef:
-            name: order-service-config
+            name: payment-service-config
         resources:
           requests:
             memory: "128Mi"
@@ -61,12 +61,12 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3004
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3004
           initialDelaySeconds: 10
           periodSeconds: 5

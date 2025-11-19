@@ -1,56 +1,58 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: order-service-config
+  name: email-service-config
   namespace: microservices
 data:
   KAFKA_BROKER: "kafka:29092"
-  SERVICE_NAME: "order-service"
+  SERVICE_NAME: "email-service"
+  EMAIL_USER: "notificaciones.labeventdriven@gmail.com"
+  EMAIL_PASS: "suni htqt utdk uuhj"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: order-service
+  name: email-service
   namespace: microservices
   labels:
-    app: order-service
+    app: email-service
 spec:
   type: ClusterIP
   ports:
-  - port: 3003
-    targetPort: 3003
+  - port: 3007
+    targetPort: 3007
     protocol: TCP
     name: http
   selector:
-    app: order-service
+    app: email-service
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: email-service
   namespace: microservices
   labels:
-    app: order-service
+    app: email-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: order-service
+      app: email-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: email-service
     spec:
       containers:
-      - name: order-service
-        image: order-service:latest
+      - name: email-service
+        image: email-service:latest
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 3003
+        - containerPort: 3007
           name: http
         envFrom:
         - configMapRef:
-            name: order-service-config
+            name: email-service-config
         resources:
           requests:
             memory: "128Mi"
@@ -61,12 +63,12 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3007
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 3003
+            port: 3007
           initialDelaySeconds: 10
           periodSeconds: 5

@@ -20,6 +20,9 @@ import (
 type Order struct {
 	OrderID   string      `json:"orderId"`
 	UserID    string      `json:"userId"`
+	UserName  string      `json:"username"`
+	Email     string      `json:"email"`
+	Phone     string      `json:"phone"`
 	Items     []OrderItem `json:"items"`
 	Total     float64     `json:"total"`
 	Status    string      `json:"status"`
@@ -96,7 +99,7 @@ func main() {
 
 	// Start HTTP server
 	srv := &http.Server{
-		Addr:    ":3004",
+		Addr:    ":3003",
 		Handler: http.DefaultServeMux,
 	}
 
@@ -117,7 +120,7 @@ func main() {
 		}
 	}()
 
-	log.Printf("Order Service running on port 3004")
+	log.Printf("Order Service running on port 3003")
 	log.Printf("Connected to Kafka broker: %s", kafkaBroker)
 
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -140,8 +143,11 @@ func handleOrders(w http.ResponseWriter, r *http.Request) {
 
 func createOrder(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		UserID string      `json:"userId"`
-		Items  []OrderItem `json:"items"`
+		UserID   string      `json:"userId"`
+		UserName string      `json:"username"`
+		Email    string      `json:"email"`
+		Phone    string      `json:"phone"`
+		Items    []OrderItem `json:"items"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -155,6 +161,11 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if req.Email == "" || req.UserName == "" || req.Phone == "" {
+		http.Error(w, "username, email and phone are required", http.StatusBadRequest)
+		return
+	}
+
 	// Calculate total
 	var total float64
 	for _, item := range req.Items {
@@ -165,6 +176,9 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	order := &Order{
 		OrderID:   fmt.Sprintf("ORD-%s", uuid.New().String()),
 		UserID:    req.UserID,
+		UserName:  req.UserName,
+		Email:     req.Email,
+		Phone:     req.Phone,
 		Items:     req.Items,
 		Total:     total,
 		Status:    "pending",

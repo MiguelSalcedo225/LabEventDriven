@@ -1,0 +1,14 @@
+{
+  "name": "microservice",
+  "version": "1.0.0",
+  "description": "Event-driven microservice with Kafka",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "kafkajs": "^2.2.4",
+    "uuid": "^9.0.1"
+  }
+}
