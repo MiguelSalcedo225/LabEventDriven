@@ -3,7 +3,7 @@
 set -e  # stop on first error
 
 echo "Starting Minikube..."
-minikube start
+minikube start --cpus=2 --memory=4096
 
 echo "Setting Docker environment for Minikube..."
 eval $(minikube -p minikube docker-env)

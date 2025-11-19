@@ -4,7 +4,8 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm ci --only=production
+# Use npm install when package-lock.json is not present to avoid build failures
+RUN npm install --only=production
 
 COPY . .
 
