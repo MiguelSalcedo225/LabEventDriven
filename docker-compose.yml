@@ -188,6 +188,17 @@ services:
       kafka:                                    
         condition: service_healthy
 
+#logging service
+  logging-service:
+    build:
+      context: ./logging-service
+      dockerfile: Dockerfile
+    container_name: logging-service
+    ports:
+      - "3009:3009"
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SERVICE_NAME=logging-service
 
 #shipping service
   shipping-service:

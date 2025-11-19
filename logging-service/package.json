@@ -1,0 +1,13 @@
+{
+  "name": "logging-service",
+  "version": "1.0.0",
+  "description": "Logging microservice for all system events",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "kafkajs": "^2.2.4"
+  }
+}

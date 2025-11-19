@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logging-service-config
+  namespace: microservices
+data:
+  KAFKA_BROKER: "kafka:29092"
+  SERVICE_NAME: "logging-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logging-service
+  namespace: microservices
+  labels:
+    app: logging-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3009
+    targetPort: 3009
+    protocol: TCP
+    name: http
+  selector:
+    app: logging-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-service
+  namespace: microservices
+  labels:
+    app: logging-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logging-service
+  template:
+    metadata:
+      labels:
+        app: logging-service
+    spec:
+      containers:
+      - name: logging-service
+        image: logging-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3009
+          name: http
+        envFrom:
+        - configMapRef:
+            name: logging-service-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3009
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3009
+          initialDelaySeconds: 10
+          periodSeconds: 5

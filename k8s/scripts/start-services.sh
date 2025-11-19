@@ -77,6 +77,13 @@ echo "--- Waiting for Analytics Service ---"
 # FIX: Do not use 'pod --all'. Target the specific app label instead.
 kubectl wait --for=condition=ready pod -l app=analytics-service -n microservices --timeout=180s
 
+echo "--- Deploying Logging Service ---"
+kubectl apply -f ../services/logging-service.yml
+
+echo "--- Waiting for Logging Service ---"
+# FIX: Do not use 'pod --all'. Target the specific app label instead.
+kubectl wait --for=condition=ready pod -l app=logging-service -n microservices --timeout=180s
+
 echo "--- All Resources ---"
 kubectl get all -n microservices
 
@@ -94,6 +101,8 @@ kubectl port-forward -n microservices svc/order-service 3003:3003 &
 kubectl port-forward -n microservices svc/inventory-service 3005:3005 &
 kubectl port-forward -n microservices svc/shipping-service 3006:3006 &
 kubectl port-forward -n microservices svc/analytics-service 3010:3010 &
+kubectl port-forward -n microservices svc/logging-service 3009:3009 &
+
 
 echo "Deployment complete. User Service accessible at localhost:3001"
 echo "Product Service accessible at localhost:3002"
@@ -101,3 +110,4 @@ echo "Shipping Service accessible at localhost:3006"
 echo "Order Service accessible at localhost:3004"
 echo "Inventory Service accessible at localhost:3005"
 echo "Analytics Service accessible at localhost:3010"
+echo "Logging Service accesible at localhost:3009"
